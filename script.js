@@ -1,8 +1,7 @@
 let tasks = [];
-let history = [];
-
-let tasks = [];
 let xp = localStorage.getItem("xp") ? parseInt(localStorage.getItem("xp")) : 20;
+let history = JSON.parse(localStorage.getItem("history")) || [];
+let streak = localStorage.getItem("streak") ? parseInt(localStorage.getItem("streak")) : 0;
 let currentTask = null;
 let timer = null;
 let seconds = 0;
