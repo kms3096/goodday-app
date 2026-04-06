@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1220;
+  color: white;
+}
+
+.app {
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.mood button {
+  margin: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.card {
+  margin-top: 20px;
+  padding: 15px;
+  background: #1c2536;
+  border-radius: 15px;
+}
+
+button {
+  background: #3b82f6;
+  color: white;
+}
+
+.tasks {
+  margin-top: 20px;
+}
