@@ -84,15 +84,9 @@ function renderTasks() {
 
 function addTask() {
   const input = document.getElementById("taskInput");
-
-  if (!input) {
-    console.error("Input não encontrado");
-    return;
-  }
-
   const nome = input.value.trim();
-
-  if (nome === "") {
+  
+  if (!nome) {
     alert("Digite uma tarefa");
     return;
   }
