@@ -1,11 +1,16 @@
 let tasks = [];
-let xp = 20;
+let xp = localStorage.getItem("xp") ? parseInt(localStorage.getItem("xp")) : 20;
 let currentTask = null;
 let timer = null;
 let seconds = 0;
 
+function saveData() {
+  localStorage.setItem("xp", xp);
+}
+
 function updateXP() {
   document.getElementById("xpFill").style.height = xp + "%";
+  saveData();
 }
 
 function setGreeting() {
@@ -15,6 +20,16 @@ function setGreeting() {
   if (hour < 12) greeting.innerText = "Bom dia ☀️";
   else if (hour < 18) greeting.innerText = "Boa tarde 🌤";
   else greeting.innerText = "Boa noite 🌙";
+}
+
+function formatTime(sec) {
+  let m = Math.floor(sec / 60);
+  let s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function updateTimer() {
+  document.getElementById("timer").innerText = formatTime(seconds);
 }
 
 function setMood(mood) {
@@ -65,7 +80,7 @@ function startTask() {
 
   timer = setInterval(() => {
     seconds++;
-    console.log("Tempo:", seconds);
+    updateTimer();
   }, 1000);
 }
 
@@ -73,16 +88,18 @@ function pauseTask() {
   clearInterval(timer);
   timer = null;
 
-  let earnedXP = Math.floor(seconds / 10);
+  let earnedXP = Math.floor(seconds / 5);
   xp += earnedXP;
 
   if (xp > 100) xp = 100;
 
   updateXP();
 
-  alert(`Você ganhou ${earnedXP} XP`);
+  alert(`+${earnedXP} XP ganho 🚀`);
   seconds = 0;
+  updateTimer();
 }
 
 setGreeting();
 updateXP();
+updateTimer();
