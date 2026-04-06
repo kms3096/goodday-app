@@ -1,4 +1,4 @@
-let tasks = [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let xp = localStorage.getItem("xp") ? parseInt(localStorage.getItem("xp")) : 20;
 let history = JSON.parse(localStorage.getItem("history")) || [];
 let streak = localStorage.getItem("streak") ? parseInt(localStorage.getItem("streak")) : 0;
@@ -11,6 +11,7 @@ function saveData() {
   localStorage.setItem("xp", xp);
   localStorage.setItem("history", JSON.stringify(history));
   localStorage.setItem("streak", streak);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 // ================= UI =================
@@ -66,7 +67,7 @@ function setMood(mood) {
      { id: Date.now()+1, nome: "Estudo profundo", status: "pending" }
    ];
   }
-  
+  saveData();
   renderTasks();
 }
 
@@ -103,6 +104,7 @@ function addTask() {
   console.log("Lista atual:", tasks);
 
   input.value = "";
+  saveData();
 
   renderTasks();
 }
@@ -145,6 +147,7 @@ function pauseTask() {
 
   seconds = 0;
   updateTimer();
+  saveData();
 
   renderTasks();
 }
@@ -167,6 +170,7 @@ function completeTask() {
 
   seconds = 0;
   updateTimer();
+  saveData();
   
   renderTasks();
 }
