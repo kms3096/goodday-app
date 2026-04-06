@@ -1,5 +1,8 @@
 let tasks = [];
 let xp = 20;
+let currentTask = null;
+let timer = null;
+let seconds = 0;
 
 function updateXP() {
   document.getElementById("xpFill").style.height = xp + "%";
@@ -42,19 +45,43 @@ function renderTasks() {
   tasks.forEach(task => {
     const li = document.createElement("li");
     li.innerText = task;
+    li.onclick = () => selectTask(task);
     list.appendChild(li);
   });
 }
 
+function selectTask(task) {
+  currentTask = task;
+  document.getElementById("focusTask").innerText = task;
+}
+
 function startTask() {
-  xp += 10;
-  if (xp > 100) xp = 100;
-  updateXP();
-  alert("Tarefa iniciada 🚀");
+  if (!currentTask) {
+    alert("Selecione uma tarefa primeiro");
+    return;
+  }
+
+  if (timer) return;
+
+  timer = setInterval(() => {
+    seconds++;
+    console.log("Tempo:", seconds);
+  }, 1000);
 }
 
 function pauseTask() {
-  alert("Tarefa pausada ⏸");
+  clearInterval(timer);
+  timer = null;
+
+  let earnedXP = Math.floor(seconds / 10);
+  xp += earnedXP;
+
+  if (xp > 100) xp = 100;
+
+  updateXP();
+
+  alert(`Você ganhou ${earnedXP} XP`);
+  seconds = 0;
 }
 
 setGreeting();
