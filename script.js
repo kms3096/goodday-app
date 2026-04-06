@@ -166,12 +166,12 @@ function renderHistory() {
   list.innerHTML = "";
 
   history.slice(-5).reverse().forEach(item => {
-    const li = document.createElement("li");
-    li.innerText = `${item.task} (+${item.xpEarned} XP)`;
-    list.appendChild(li);
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+    div.innerText = `${item.task} • +${item.xpEarned} XP`;
+    list.appendChild(div);
   });
 }
-
 // =================== STREAK ===================
 function updateStreak(today) {
   if (!lastDate) {
