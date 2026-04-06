@@ -71,7 +71,7 @@ function renderTasks() {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
-    li.innerText = task.nome;
+    li.innerText = `${task.nome} ${getStatusText(task.status)}`;
     li.onclick = () => selectTask(task);
     list.appendChild(li);
   });
@@ -90,15 +90,24 @@ function startTask() {
 
   if (timer) return;
 
+  // atualiza status
+  currentTask.status = "in_progress";
+
   timer = setInterval(() => {
     seconds++;
     updateTimer();
   }, 1000);
+
+  renderTasks();
 }
 
 function pauseTask() {
+  if (!currentTask) return;
+
   clearInterval(timer);
   timer = null;
+
+  currentTask.status = "paused";
 
   let earnedXP = Math.floor(seconds / 5);
   xp += earnedXP;
@@ -107,9 +116,44 @@ function pauseTask() {
 
   updateXP();
 
-  alert(`+${earnedXP} XP ganho 🚀`);
+  saveHistory(currentTask.nome, earnedXP, "paused");
+
+  showXPPopup(earnedXP);
+
   seconds = 0;
   updateTimer();
+
+  renderTasks();
+}
+function completeTask() {
+  if (!currentTask) return;
+
+  clearInterval(timer);
+  timer = null;
+
+  currentTask.status = "done";
+
+  let earnedXP = Math.floor(seconds / 3) + 10;
+  xp += earnedXP;
+
+  if (xp > 100) xp = 100;
+
+  updateXP();
+
+  function saveHistory(task, xpEarned, status) {
+   history.push({
+   task,
+   xpEarned,
+   status,
+   date: today
+});
+
+  showXPPopup(earnedXP);
+
+  seconds = 0;
+  updateTimer();
+
+  renderTasks();
 }
 
 setGreeting();
