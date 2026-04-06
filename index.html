@@ -1,64 +1,57 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>GoodDay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoodDay</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="container">
+  <div class="container">
 
-  <!-- XP BAR -->
-  <div class="xp-bar">
-    <div class="xp-fill" id="xpFill"></div>
-  </div>
+    <h1>🌞 GoodDay</h1>
 
-  <!-- MAIN -->
-  <div class="main">
+    <!-- CRIAR TAREFA -->
+    <div class="card">
+      <h3>Nova tarefa</h3>
 
-    <!-- HEADER -->
-    <header>
-      <h1>GoodDay</h1>
-      <p id="greeting">Bom dia 👋</p>
-    </header>
+      <input 
+        type="text" 
+        id="taskInput" 
+        placeholder="Digite sua tarefa..."
+      >
 
-    <!-- MOOD -->
-    <section class="mood">
-      <button onclick="setMood('leve')">🙂 Leve</button>
-      <button onclick="setMood('moderado')">😐 Moderado</button>
-      <button onclick="setMood('intenso')">🔥 Intenso</button>
-    </section>
+      <select id="difficulty">
+        <option value="facil">Fácil</option>
+        <option value="media">Média</option>
+        <option value="dificil">Difícil</option>
+      </select>
 
-    <!-- FOCUS CARD -->
-    <section class="card focus">
-      <h2>Foco do momento</h2>
-      <p id="focusTask">Escolha seu estado</p>
-      <p id="timer">00:00</p>
-      <div class="actions">
-        <button onclick="startTask()">▶ Iniciar</button>
-        <button onclick="pauseTask()">⏸ Pausar</button>
-      </div>
-    </section>
+      <button onclick="addTask()">Adicionar</button>
+    </div>
 
-    <!-- TASK LIST -->
-    <section class="card">
-      <h3>Tarefas</h3>
-      <ul id="taskList"></ul>
-    </section>
-    
-    <section class="card">
+    <!-- LISTA DE TAREFAS -->
+    <div class="card">
+      <h3>Suas tarefas</h3>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- TIMELINE / PROGRESSO -->
+    <div class="card">
       <h3>Progresso do Dia</h3>
       <p id="streak">🔥 Streak: 0 dias</p>
       <div id="historyList" class="timeline"></div>
-   </section>
-    
-    <div id="xpPopup" class="xp-popup"></div>
-  </div>
-</div>
+    </div>
 
-<script src="script.js"></script>
+  </div>
+
+  <!-- POPUP XP -->
+  <div id="xpPopup" class="xp-popup"></div>
+
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+
 </body>
 </html>
