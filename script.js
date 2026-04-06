@@ -1,192 +1,111 @@
-/* ================= ESTADO ================= */
-
 let tasks = [];
 let history = [];
 
-/* ================= CRIAR TAREFA ================= */
+let tasks = [];
+let xp = localStorage.getItem("xp") ? parseInt(localStorage.getItem("xp")) : 20;
+let currentTask = null;
+let timer = null;
+let seconds = 0;
 
-function addTask() {
-  const input = document.getElementById("taskInput");
-  const difficulty = document.getElementById("difficulty");
+function saveData() {
+  localStorage.setItem("xp", xp);
+}
 
-  if (!input.value) return;
+function updateXP() {
+  document.getElementById("xpFill").style.height = xp + "%";
+  saveData();
+}
 
-  const task = {
-    id: Date.now(),
-    task: input.value,
-    difficulty: difficulty.value,
-    status: "created",
-    startTime: null,
-    totalTime: 0,
-    date: new Date().toISOString()
-  };
+function setGreeting() {
+  const hour = new Date().getHours();
+  const greeting = document.getElementById("greeting");
 
-  tasks.push(task);
+  if (hour < 12) greeting.innerText = "Bom dia ☀️";
+  else if (hour < 18) greeting.innerText = "Boa tarde 🌤";
+  else greeting.innerText = "Boa noite 🌙";
+}
 
-  input.value = "";
+function formatTime(sec) {
+  let m = Math.floor(sec / 60);
+  let s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function updateTimer() {
+  document.getElementById("timer").innerText = formatTime(seconds);
+}
+
+function setMood(mood) {
+  let focus = document.getElementById("focusTask");
+
+  if (mood === "leve") {
+    focus.innerText = "Organizar algo simples";
+    tasks = ["Arrumar mesa", "Responder mensagens"];
+  }
+
+  if (mood === "moderado") {
+    focus.innerText = "Manter produtividade";
+    tasks = ["Estudar 30 min", "Exercício leve"];
+  }
+
+  if (mood === "intenso") {
+    focus.innerText = "Alta performance";
+    tasks = ["Projeto importante", "Estudo profundo"];
+  }
 
   renderTasks();
 }
-
-/* ================= RENDER TASKS ================= */
 
 function renderTasks() {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
 
   tasks.forEach(task => {
-    const div = document.createElement("div");
-    div.className = "task-card";
-
-    div.innerHTML = `
-      <div class="task-title">${task.task}</div>
-
-      <div class="task-actions">
-        <button onclick="startTask(${task.id})">▶</button>
-        <button onclick="pauseTask(${task.id})">⏸</button>
-        <button onclick="finishTask(${task.id})">✅</button>
-      </div>
-    `;
-
-    list.appendChild(div);
+    const li = document.createElement("li");
+    li.innerText = task;
+    li.onclick = () => selectTask(task);
+    list.appendChild(li);
   });
 }
 
-/* ================= AÇÕES ================= */
-
-function startTask(id) {
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-
-  task.status = "in_progress";
-  task.startTime = Date.now();
-
-  vibrate();
-  renderTasks();
+function selectTask(task) {
+  currentTask = task;
+  document.getElementById("focusTask").innerText = task;
 }
 
-function pauseTask(id) {
-  const task = tasks.find(t => t.id === id);
-  if (!task || task.status !== "in_progress") return;
-
-  task.status = "paused";
-  task.totalTime += Date.now() - task.startTime;
-  task.startTime = null;
-
-  vibrate();
-  renderTasks();
-}
-
-function finishTask(id) {
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-
-  if (task.startTime) {
-    task.totalTime += Date.now() - task.startTime;
+function startTask() {
+  if (!currentTask) {
+    alert("Selecione uma tarefa primeiro");
+    return;
   }
 
-  task.status = "done";
+  if (timer) return;
 
-  const earnedXP = calculateXP(task);
-
-  history.push({
-    task: task.task,
-    xpEarned: earnedXP,
-    date: new Date().toISOString(),
-    status: "done"
-  });
-
-  showXPAnimation(earnedXP);
-  vibrate();
-
-  tasks = tasks.filter(t => t.id !== id);
-
-  renderTasks();
-  renderHistory();
+  timer = setInterval(() => {
+    seconds++;
+    updateTimer();
+  }, 1000);
 }
 
-/* ================= XP ================= */
+function pauseTask() {
+  clearInterval(timer);
+  timer = null;
 
-function calculateXP(task) {
-  let base = {
-    facil: 10,
-    media: 20,
-    dificil: 40
-  }[task.difficulty] || 10;
+  let earnedXP = Math.floor(seconds / 5);
+  xp += earnedXP;
 
-  const timeBonus = Math.floor(task.totalTime / 60000);
+  if (xp > 100) xp = 100;
 
-  return base + timeBonus;
+  updateXP();
+
+  alert(`+${earnedXP} XP ganho 🚀`);
+  seconds = 0;
+  updateTimer();
 }
 
-/* ================= TIMELINE ================= */
-
-function renderHistory() {
-  const list = document.getElementById("historyList");
-  list.innerHTML = "";
-
-  history.slice(-7).reverse().forEach(item => {
-    const div = document.createElement("div");
-    div.className = "timeline-item";
-
-    div.innerHTML = `
-      <div class="timeline-top">
-        <span>${formatDate(item.date)}</span>
-        <span class="timeline-xp">+${item.xpEarned} XP</span>
-      </div>
-
-      <div class="timeline-title">${item.task}</div>
-
-      <div class="timeline-status">
-        ${getStatusText(item.status)}
-      </div>
-    `;
-
-    list.appendChild(div);
-  });
-}
-
-/* ================= HELPERS ================= */
-
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("pt-BR", {
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit"
-  });
-}
-
-function getStatusText(status) {
-  if (status === "done") return "✅ Concluído";
-  if (status === "paused") return "⏸️ Pausado";
-  if (status === "in_progress") return "🚀 Em andamento";
-  return "📌 Criado";
-}
-
-/* ================= ANIMAÇÃO XP ================= */
-
-function showXPAnimation(xp) {
-  const popup = document.getElementById("xpPopup");
-  popup.innerText = `+${xp} XP 🚀`;
-  popup.classList.add("show");
-
-  setTimeout(() => {
-    popup.classList.remove("show");
-  }, 2000);
-}
-
-/* ================= FEEDBACK ================= */
-
-function vibrate() {
-  if (navigator.vibrate) {
-    navigator.vibrate(50);
-  }
-}
-
-/* ================= INIT ================= */
-
-function init() {
+setGreeting();
+updateXP();
+updateTimer();
   renderTasks();
   renderHistory();
 }
