@@ -1,125 +1,106 @@
-body {
+b/* RESET */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
+}
+
+/* BODY */
+body {
   background: linear-gradient(180deg, #0b1220, #111827);
-  color: white;
-}
-
-.container {
-  display: flex;
-}
-
-/* XP BAR */
-.xp-bar {
-  width: 10px;
-  height: 100vh;
-  background: #1f2937;
-}
-
-.xp-fill {
-  width: 100%;
-  height: 20%;
-  background: linear-gradient(180deg, #22c55e, #4ade80);
-  transition: height 0.3s;
-}
-
-/* MAIN */
-.main {
-  flex: 1;
+  color: #fff;
   padding: 20px;
 }
 
-/* HEADER */
-header {
-  margin-bottom: 20px;
+/* CONTAINER */
+.container {
+  max-width: 500px;
+  margin: auto;
 }
 
-h1 {
-  margin: 0;
+/* CARD PADRÃO */
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
 }
 
-#greeting {
-  opacity: 0.7;
+/* TITULOS */
+h1, h2, h3 {
+  margin-bottom: 10px;
 }
 
-/* MOOD */
-.mood button {
-  margin-right: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
+/* INPUTS */
+input, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
   border: none;
-  background: #1f2937;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.08);
   color: white;
+}
+
+/* BOTÕES */
+button {
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
   cursor: pointer;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
   transition: 0.2s;
 }
 
-.mood button:hover {
-  background: #374151;
+button:hover {
+  opacity: 0.85;
+  transform: scale(1.03);
 }
 
-/* CARDS */
-.card {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+/* ================= TASKS ================= */
+
+.task-card {
+  background: rgba(255,255,255,0.05);
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  transition: 0.2s;
 }
 
-/* ACTIONS */
-.actions button {
-  margin-right: 10px;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-  background: #3b82f6;
-  color: white;
-  cursor: pointer;
+.task-card:hover {
+  transform: scale(1.02);
+  background: rgba(255,255,255,0.08);
 }
 
-.actions button:hover {
-  background: #2563eb;
-}
-
-/* TASKS */
-ul {
-  padding-left: 20px;
-}
-
-li {
+.task-title {
+  font-size: 15px;
+  font-weight: bold;
   margin-bottom: 8px;
 }
 
-/* timer */
-#timer {
-  font-size: 28px;
-  margin-top: 10px;
-  opacity: 0.8;
-}
-
-.timeline {
+.task-actions {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 6px;
 }
 
-.timeline-item {
-  padding: 10px;
-  border-left: 3px solid #3b82f6;
-  background: rgba(255,255,255,0.03);
+.task-actions button {
+  flex: 1;
+  padding: 6px;
   border-radius: 8px;
   font-size: 14px;
 }
+
+/* ================= TIMELINE ================= */
 
 .timeline {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .timeline-item {
@@ -128,7 +109,7 @@ li {
   padding: 12px;
   border-left: 4px solid #3b82f6;
   background: rgba(255,255,255,0.04);
-  border-radius: 10px;
+  border-radius: 12px;
   transition: 0.2s;
 }
 
@@ -140,19 +121,28 @@ li {
 .timeline-top {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.7;
 }
 
 .timeline-title {
   font-weight: bold;
   font-size: 15px;
+  margin-top: 4px;
 }
 
 .timeline-xp {
   color: #22c55e;
   font-weight: bold;
 }
+
+.timeline-status {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* ================= XP POPUP ================= */
 
 .xp-popup {
   position: fixed;
@@ -166,14 +156,46 @@ li {
   opacity: 0;
   transform: translateY(-20px);
   transition: 0.4s;
+  z-index: 999;
 }
 
 .xp-popup.show {
   opacity: 1;
   transform: translateY(0);
 }
-.timeline-status {
-  margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.8;
+
+/* ================= SCROLL ================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 10px;
+}
+
+/* ================= LIGHT MODE (futuro toggle) ================= */
+
+body.light {
+  background: #f3f4f6;
+  color: #111;
+}
+
+body.light .card {
+  background: #fff;
+}
+
+body.light input,
+body.light select {
+  background: #eee;
+  color: #111;
+}
+
+body.light .task-card {
+  background: #fff;
+}
+
+body.light .timeline-item {
+  background: #fff;
 }
