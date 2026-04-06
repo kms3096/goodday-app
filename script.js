@@ -12,6 +12,7 @@ function saveData() {
   localStorage.setItem("history", JSON.stringify(history));
   localStorage.setItem("streak", streak);
   localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("currentTaskId", currentTask ? currentTask.id : null);
 }
 
 // ================= UI =================
@@ -78,37 +79,28 @@ function renderTasks() {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
+
     li.innerText = task.nome;
+
+    // 🎯 destaque da tarefa ativa
+    if (currentTask && currentTask.id === task.id) {
+      li.style.background = "#22c55e";
+      li.style.color = "#000";
+    }
+
+    li.onclick = () => {
+      currentTask = task;
+
+      document.getElementById("focusTask").innerText = task.nome;
+
+      saveData(); // 🔥 IMPORTANTE
+
+      renderTasks();
+    };
+
     list.appendChild(li);
   });
 }
-
-function addTask() {
-  const input = document.getElementById("taskInput");
-  const nome = input.value.trim();
-  
-  if (!nome) {
-    alert("Digite uma tarefa");
-    return;
-  }
-
-  const novaTask = {
-    id: Date.now(),
-    nome: nome,
-    status: "pending"
-  };
-
-  tasks.push(novaTask);
-
-  console.log("Tarefa adicionada:", novaTask);
-  console.log("Lista atual:", tasks);
-
-  input.value = "";
-  saveData();
-
-  renderTasks();
-}
-
 // ================= CONTROLES =================
 function startTask() {
   if (!currentTask) {
@@ -204,9 +196,18 @@ function init() {
   setGreeting();
   updateXP();
   updateTimer();
+  const savedId = localStorage.getItem("currentTaskId");
+
+  if (savedId) {
+  currentTask = tasks.find(t => t.id == savedId);
+  
+  if (currentTask) {
+    document.getElementById("focusTask").innerText = currentTask.nome;
+  }
+}
   renderTasks();
   renderHistory();
-
+  
   document.getElementById("streak").innerText = `🔥 Streak: ${streak} dias`;
 }
 
