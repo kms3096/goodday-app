@@ -213,4 +213,19 @@ function init() {
   document.getElementById("streak").innerText = `🔥 Streak: ${streak} dias`;
 }
 
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("pt-BR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit"
+  });
+}
+
+function getStatusText(status) {
+  if (status === "done") return "✅ Concluído";
+  if (status === "paused") return "⏸️ Pausado";
+  if (status === "in_progress") return "🚀 Em andamento";
+  return "📌 Criado";
+}
 init();
