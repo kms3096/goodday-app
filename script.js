@@ -1,165 +1,125 @@
+/* ================= ESTADO ================= */
+
 let tasks = [];
-let xp = localStorage.getItem("xp") ? parseInt(localStorage.getItem("xp")) : 20;
-let history = JSON.parse(localStorage.getItem("history")) || [];
-let streak = localStorage.getItem("streak") ? parseInt(localStorage.getItem("streak")) : 0;
+let history = [];
 
-let currentTask = null;
-let timer = null;
-let seconds = 0;
-let lastDate = localStorage.getItem("lastDate") || null;
+/* ================= CRIAR TAREFA ================= */
 
-// =================== SAVE ===================
-function saveData() {
-  localStorage.setItem("xp", xp);
-  localStorage.setItem("history", JSON.stringify(history));
-  localStorage.setItem("streak", streak);
-  localStorage.setItem("lastDate", lastDate);
-}
+function addTask() {
+  const input = document.getElementById("taskInput");
+  const difficulty = document.getElementById("difficulty");
 
-// =================== XP ===================
-function updateXP() {
-  document.getElementById("xpFill").style.height = xp + "%";
-  saveData();
-}
+  if (!input.value) return;
 
-// =================== GREETING ===================
-function setGreeting() {
-  const hour = new Date().getHours();
-  const greeting = document.getElementById("greeting");
-
-  if (hour < 12) greeting.innerText = "Bom dia ☀️";
-  else if (hour < 18) greeting.innerText = "Boa tarde 🌤";
-  else greeting.innerText = "Boa noite 🌙";
-}
-
-// =================== TIMER ===================
-function formatTime(sec) {
-  let m = Math.floor(sec / 60);
-  let s = sec % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-
-function updateTimer() {
-  document.getElementById("timer").innerText = formatTime(seconds);
-}
-
-// =================== IA SIMPLES ===================
-function getSmartTasks(mood) {
-  let usage = JSON.parse(localStorage.getItem("moodUsage")) || {
-    leve: 0,
-    moderado: 0,
-    intenso: 0
+  const task = {
+    id: Date.now(),
+    task: input.value,
+    difficulty: difficulty.value,
+    status: "created",
+    startTime: null,
+    totalTime: 0,
+    date: new Date().toISOString()
   };
 
-  usage[mood]++;
-  localStorage.setItem("moodUsage", JSON.stringify(usage));
+  tasks.push(task);
 
-  if (usage.leve > usage.intenso) {
-    return ["Organizar algo leve", "Descansar mente"];
-  }
-
-  if (usage.intenso > 5) {
-    return ["Desafio avançado", "Projeto complexo"];
-  }
-
-  return null;
-}
-
-// =================== MOOD ===================
-function setMood(mood) {
-  let focus = document.getElementById("focusTask");
-
-  let smart = getSmartTasks(mood);
-
-  if (smart) {
-    tasks = smart;
-    focus.innerText = "Sugestão inteligente 🔥";
-  } else {
-    if (mood === "leve") {
-      focus.innerText = "Organizar algo simples";
-      tasks = ["Arrumar mesa", "Responder mensagens"];
-    }
-
-    if (mood === "moderado") {
-      focus.innerText = "Manter produtividade";
-      tasks = ["Estudar 30 min", "Exercício leve"];
-    }
-
-    if (mood === "intenso") {
-      focus.innerText = "Alta performance";
-      tasks = ["Projeto importante", "Estudo profundo"];
-    }
-  }
+  input.value = "";
 
   renderTasks();
 }
 
-// =================== TASKS ===================
+/* ================= RENDER TASKS ================= */
+
 function renderTasks() {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
 
   tasks.forEach(task => {
-    const li = document.createElement("li");
-    li.innerText = task;
-    li.onclick = () => selectTask(task);
-    list.appendChild(li);
+    const div = document.createElement("div");
+    div.className = "task-card";
+
+    div.innerHTML = `
+      <div class="task-title">${task.task}</div>
+
+      <div class="task-actions">
+        <button onclick="startTask(${task.id})">▶</button>
+        <button onclick="pauseTask(${task.id})">⏸</button>
+        <button onclick="finishTask(${task.id})">✅</button>
+      </div>
+    `;
+
+    list.appendChild(div);
   });
 }
 
-function selectTask(task) {
-  currentTask = task;
-  document.getElementById("focusTask").innerText = task;
+/* ================= AÇÕES ================= */
+
+function startTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+
+  task.status = "in_progress";
+  task.startTime = Date.now();
+
+  vibrate();
+  renderTasks();
 }
 
-// =================== START ===================
-function startTask() {
-  if (!currentTask) {
-    alert("Selecione uma tarefa primeiro");
-    return;
+function pauseTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task || task.status !== "in_progress") return;
+
+  task.status = "paused";
+  task.totalTime += Date.now() - task.startTime;
+  task.startTime = null;
+
+  vibrate();
+  renderTasks();
+}
+
+function finishTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+
+  if (task.startTime) {
+    task.totalTime += Date.now() - task.startTime;
   }
 
-  if (timer) return;
+  task.status = "done";
 
-  timer = setInterval(() => {
-    seconds++;
-    updateTimer();
-  }, 1000);
-}
-
-// =================== PAUSE ===================
-function pauseTask() {
-  clearInterval(timer);
-  timer = null;
-
-  let earnedXP = Math.floor(seconds / 5);
-  xp += earnedXP;
-
-  if (xp > 100) xp = 100;
-
-  updateXP();
-
-  saveHistory(currentTask, earnedXP);
-
-  alert(`+${earnedXP} XP 🚀`);
-  seconds = 0;
-  updateTimer();
-}
-
-// =================== HISTORY ===================
-function saveHistory(task, xpEarned) {
-  let today = new Date().toLocaleDateString();
+  const earnedXP = calculateXP(task);
 
   history.push({
-    task,
-    xpEarned,
-    date: today
+    task: task.task,
+    xpEarned: earnedXP,
+    date: new Date().toISOString(),
+    status: "done"
   });
 
-  updateStreak(today);
+  showXPAnimation(earnedXP);
+  vibrate();
+
+  tasks = tasks.filter(t => t.id !== id);
+
+  renderTasks();
   renderHistory();
-  saveData();
 }
+
+/* ================= XP ================= */
+
+function calculateXP(task) {
+  let base = {
+    facil: 10,
+    media: 20,
+    dificil: 40
+  }[task.difficulty] || 10;
+
+  const timeBonus = Math.floor(task.totalTime / 60000);
+
+  return base + timeBonus;
+}
+
+/* ================= TIMELINE ================= */
 
 function renderHistory() {
   const list = document.getElementById("historyList");
@@ -185,33 +145,8 @@ function renderHistory() {
     list.appendChild(div);
   });
 }
-// =================== STREAK ===================
-function updateStreak(today) {
-  if (!lastDate) {
-    streak = 1;
-  } else {
-    let last = new Date(lastDate);
-    let current = new Date(today);
 
-    let diff = (current - last) / (1000 * 60 * 60 * 24);
-
-    if (diff === 1) streak++;
-    else if (diff > 1) streak = 1;
-  }
-
-  lastDate = today;
-  document.getElementById("streak").innerText = `🔥 Streak: ${streak} dias`;
-}
-
-// =================== INIT ===================
-function init() {
-  setGreeting();
-  updateXP();
-  updateTimer();
-  renderHistory();
-
-  document.getElementById("streak").innerText = `🔥 Streak: ${streak} dias`;
-}
+/* ================= HELPERS ================= */
 
 function formatDate(dateStr) {
   const d = new Date(dateStr);
@@ -228,4 +163,32 @@ function getStatusText(status) {
   if (status === "in_progress") return "🚀 Em andamento";
   return "📌 Criado";
 }
+
+/* ================= ANIMAÇÃO XP ================= */
+
+function showXPAnimation(xp) {
+  const popup = document.getElementById("xpPopup");
+  popup.innerText = `+${xp} XP 🚀`;
+  popup.classList.add("show");
+
+  setTimeout(() => {
+    popup.classList.remove("show");
+  }, 2000);
+}
+
+/* ================= FEEDBACK ================= */
+
+function vibrate() {
+  if (navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+}
+
+/* ================= INIT ================= */
+
+function init() {
+  renderTasks();
+  renderHistory();
+}
+
 init();
