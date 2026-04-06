@@ -6,10 +6,14 @@ let currentTask = null;
 let timer = null;
 let seconds = 0;
 
+// ================= SAVE =================
 function saveData() {
   localStorage.setItem("xp", xp);
+  localStorage.setItem("history", JSON.stringify(history));
+  localStorage.setItem("streak", streak);
 }
 
+// ================= UI =================
 function updateXP() {
   document.getElementById("xpFill").style.height = xp + "%";
   saveData();
@@ -24,6 +28,7 @@ function setGreeting() {
   else greeting.innerText = "Boa noite 🌙";
 }
 
+// ================= TIMER =================
 function formatTime(sec) {
   let m = Math.floor(sec / 60);
   let s = sec % 60;
@@ -34,8 +39,9 @@ function updateTimer() {
   document.getElementById("timer").innerText = formatTime(seconds);
 }
 
+// ================= MOOD =================
 function setMood(mood) {
-  let focus = document.getElementById("focusTask");
+  const focus = document.getElementById("focusTask");
 
   if (mood === "leve") {
     focus.innerText = "Organizar algo simples";
@@ -60,19 +66,11 @@ function setMood(mood) {
      { id: Date.now()+1, nome: "Estudo profundo", status: "pending" }
    ];
   }
-  if (tasks.some(t => t.nome === nome)) {
-  alert("Tarefa já existe");
-  return;
-}
-  const novasTasks = [
-  { id: Date.now(), nome: "Arrumar mesa", status: "pending" },
-  { id: Date.now()+1, nome: "Responder mensagens", status: "pending" }
-];
-  tasks = [...tasks, ...novasTasks];
-
+  
   renderTasks();
 }
 
+// ================= TASKS =================
 function renderTasks() {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
@@ -80,7 +78,7 @@ function renderTasks() {
   tasks.forEach(task => {
     const li = document.createElement("li");
 
-    li.innerText = `${task.nome} ${getStatusText(task.status)}`;
+    li.innerText = task.nome;
 
     li.onclick = () => {
       currentTask = task;
@@ -91,6 +89,35 @@ function renderTasks() {
   });
 }
 
+function addTask() {
+  const input = document.getElementById("taskInput");
+  const nome = input.value.trim();
+
+  if (!nome) {
+    alert("Digite uma tarefa");
+    return;
+  }
+
+  // evitar duplicadas
+  if (tasks.some(t => t.nome === nome)) {
+    alert("Tarefa já existe");
+    return;
+  }
+
+  const novaTask = {
+    id: Date.now(),
+    nome: nome,
+    status: "pending"
+  };
+
+  tasks.push(novaTask);
+
+  input.value = "";
+
+  renderTasks();
+}
+
+// ================= CONTROLES =================
 function selectTask(task) {
   currentTask = task;
   document.getElementById("focusTask").innerText = task.nome;
@@ -131,8 +158,6 @@ function pauseTask() {
 
   saveHistory(currentTask.nome, earnedXP, "paused");
 
-  showXPPopup(earnedXP);
-
   seconds = 0;
   updateTimer();
 
@@ -153,22 +178,15 @@ function completeTask() {
 
   updateXP();
 
-  function saveHistory(task, xpEarned, status) {
-   history.push({
-   task,
-   xpEarned,
-   status,
-   date: today
-});
-
-  showXPPopup(earnedXP);
+  saveHistory(currentTask.nome, earnedXP, "done");
 
   seconds = 0;
   updateTimer();
 
   renderTasks();
 }
-  function addTask() {
+
+function addTask() {
   const input = document.getElementById("taskInput");
   const nome = input.value.trim();
 
@@ -189,7 +207,6 @@ function completeTask() {
 
   renderTasks(); // 🔥 ESSENCIAL
 }
-  
 
   const novaTask = {
     id: Date.now(),
@@ -203,6 +220,32 @@ function completeTask() {
 
   renderTasks();
 }
+// ================= HISTÓRICO =================
+function saveHistory(task, xpEarned, status) {
+  const today = new Date().toLocaleDateString();
+
+  history.push({
+    task,
+    xpEarned,
+    status,
+    date: today
+  });
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  history.forEach(item => {
+    const div = document.createElement("div");
+    div.innerText = `${item.date} - ${item.task} (+${item.xpEarned} XP)`;
+    list.appendChild(div);
+  });
+}
+
+// ================= INIT =================
 function init() {
   setGreeting();
   updateXP();
