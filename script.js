@@ -77,28 +77,36 @@ function renderTasks() {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
-
     li.innerText = task.nome;
-
-    li.onclick = () => {
-      currentTask = task;
-      document.getElementById("focusTask").innerText = task.nome;
-    };
-
     list.appendChild(li);
   });
 }
 
 function addTask() {
   const input = document.getElementById("taskInput");
+
+  if (!input) {
+    console.error("Input não encontrado");
+    return;
+  }
+
   const nome = input.value.trim();
 
-  if (!nome) {
+  if (nome === "") {
     alert("Digite uma tarefa");
     return;
   }
 
+  const novaTask = {
+    id: Date.now(),
+    nome: nome,
+    status: "pending"
+  };
+
   tasks.push(novaTask);
+
+  console.log("Tarefa adicionada:", novaTask);
+  console.log("Lista atual:", tasks);
 
   input.value = "";
 
