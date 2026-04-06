@@ -61,6 +61,15 @@ function setMood(mood) {
      { id: Date.now()+1, nome: "Estudo profundo", status: "pending" }
    ];
   }
+  if (tasks.some(t => t.nome === nome)) {
+  alert("Tarefa já existe");
+  return;
+}
+  const novasTasks = [
+  { id: Date.now(), nome: "Arrumar mesa", status: "pending" },
+  { id: Date.now()+1, nome: "Responder mensagens", status: "pending" }
+];
+  tasks = [...tasks, ...novasTasks];
 
   renderTasks();
 }
@@ -152,6 +161,27 @@ function completeTask() {
 
   seconds = 0;
   updateTimer();
+
+  renderTasks();
+}
+  function addTask() {
+  const input = document.getElementById("taskInput");
+  const nome = input.value.trim();
+
+  if (!nome) {
+    alert("Digite uma tarefa");
+    return;
+  }
+
+  const novaTask = {
+    id: Date.now(),
+    nome: nome,
+    status: "pending"
+  };
+
+  tasks.push(novaTask);
+
+  input.value = "";
 
   renderTasks();
 }
