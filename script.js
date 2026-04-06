@@ -98,18 +98,6 @@ function addTask() {
     return;
   }
 
-  // evitar duplicadas
-  if (tasks.some(t => t.nome === nome)) {
-    alert("Tarefa já existe");
-    return;
-  }
-
-  const novaTask = {
-    id: Date.now(),
-    nome: nome,
-    status: "pending"
-  };
-
   tasks.push(novaTask);
 
   input.value = "";
@@ -118,11 +106,6 @@ function addTask() {
 }
 
 // ================= CONTROLES =================
-function selectTask(task) {
-  currentTask = task;
-  document.getElementById("focusTask").innerText = task.nome;
-}
-
 function startTask() {
   if (!currentTask) {
     alert("Selecione uma tarefa primeiro");
@@ -194,25 +177,6 @@ function addTask() {
     alert("Digite uma tarefa");
     return;
   }
-
-  const novaTask = {
-    id: Date.now(),
-    nome: nome,
-    status: "pending"
-  };
-
-  tasks.push(novaTask);
-
-  input.value = "";
-
-  renderTasks(); // 🔥 ESSENCIAL
-}
-
-  const novaTask = {
-    id: Date.now(),
-    nome: nome,
-    status: "pending"
-  };
 
   tasks.push(novaTask);
 
