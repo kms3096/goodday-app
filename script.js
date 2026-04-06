@@ -173,23 +173,7 @@ function completeTask() {
 
   seconds = 0;
   updateTimer();
-
-  renderTasks();
-}
-
-function addTask() {
-  const input = document.getElementById("taskInput");
-  const nome = input.value.trim();
-
-  if (!nome) {
-    alert("Digite uma tarefa");
-    return;
-  }
-
-  tasks.push(novaTask);
-
-  input.value = "";
-
+  
   renderTasks();
 }
 // ================= HISTÓRICO =================
