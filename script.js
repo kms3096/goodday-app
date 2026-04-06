@@ -80,8 +80,14 @@ function renderTasks() {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
+
     li.innerText = `${task.nome} ${getStatusText(task.status)}`;
-    li.onclick = () => selectTask(task);
+
+    li.onclick = () => {
+      currentTask = task;
+      document.getElementById("focusTask").innerText = task.nome;
+    };
+
     list.appendChild(li);
   });
 }
@@ -99,7 +105,6 @@ function startTask() {
 
   if (timer) return;
 
-  // atualiza status
   currentTask.status = "in_progress";
 
   timer = setInterval(() => {
@@ -183,14 +188,30 @@ function completeTask() {
 
   input.value = "";
 
+  renderTasks(); // 🔥 ESSENCIAL
+}
+  
+
+  const novaTask = {
+    id: Date.now(),
+    nome: nome,
+    status: "pending"
+  };
+
+  tasks.push(novaTask);
+
+  input.value = "";
+
   renderTasks();
 }
-
-setGreeting();
-updateXP();
-updateTimer();
+function init() {
+  setGreeting();
+  updateXP();
+  updateTimer();
   renderTasks();
   renderHistory();
+
+  document.getElementById("streak").innerText = `🔥 Streak: ${streak} dias`;
 }
 
 init();
