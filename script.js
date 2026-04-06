@@ -40,17 +40,26 @@ function setMood(mood) {
 
   if (mood === "leve") {
     focus.innerText = "Organizar algo simples";
-    tasks = ["Arrumar mesa", "Responder mensagens"];
+    tasks = [
+     { id: Date.now(), nome: "Arrumar mesa", status: "pending" },
+     { id: Date.now()+1, nome: "Responder mensagens", status: "pending" }
+   ];
   }
 
   if (mood === "moderado") {
     focus.innerText = "Manter produtividade";
-    tasks = ["Estudar 30 min", "Exercício leve"];
+    tasks = [
+     { id: Date.now(), nome: "Estudar 30 min", status: "pending" },
+     { id: Date.now()+1, nome: "Exercício leve", status: "pending" }
+   ];
   }
 
   if (mood === "intenso") {
     focus.innerText = "Alta performance";
-    tasks = ["Projeto importante", "Estudo profundo"];
+    tasks = [
+     { id: Date.now(), nome: "Projeto importante", status: "pending" },
+     { id: Date.now()+1, nome: "Estudo profundo", status: "pending" }
+   ];
   }
 
   renderTasks();
@@ -62,7 +71,7 @@ function renderTasks() {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
-    li.innerText = task;
+    li.innerText = task.nome;
     li.onclick = () => selectTask(task);
     list.appendChild(li);
   });
@@ -70,7 +79,7 @@ function renderTasks() {
 
 function selectTask(task) {
   currentTask = task;
-  document.getElementById("focusTask").innerText = task;
+  document.getElementById("focusTask").innerText = task.nome;
 }
 
 function startTask() {
