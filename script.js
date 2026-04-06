@@ -165,10 +165,23 @@ function renderHistory() {
   const list = document.getElementById("historyList");
   list.innerHTML = "";
 
-  history.slice(-5).reverse().forEach(item => {
+  history.slice(-7).reverse().forEach(item => {
     const div = document.createElement("div");
     div.className = "timeline-item";
-    div.innerText = `${item.task} • +${item.xpEarned} XP`;
+
+    div.innerHTML = `
+      <div class="timeline-top">
+        <span>${formatDate(item.date)}</span>
+        <span class="timeline-xp">+${item.xpEarned} XP</span>
+      </div>
+
+      <div class="timeline-title">${item.task}</div>
+
+      <div class="timeline-status">
+        ${getStatusText(item.status)}
+      </div>
+    `;
+
     list.appendChild(div);
   });
 }
